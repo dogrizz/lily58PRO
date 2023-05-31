@@ -30,7 +30,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define QUICK_TAP_TERM 0
 #define TAPPING_TERM 350
-#define IGNORE_MOD_TAP_INTERRUPT
 // Underglow
 /*
 #undef RGBLED_NUM
