@@ -22,17 +22,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 //#define USE_MATRIX_I2C
 
-/* Select hand configuration */
-
 #define MASTER_LEFT
-// #define MASTER_RIGHT
-// #define EE_HANDS
 
 #define QUICK_TAP_TERM 0
 #define TAPPING_TERM 350
-// Underglow
-/*
-#undef RGBLED_NUM
-#define RGBLED_NUM 14    // Number of LEDs
-#define RGBLIGHT_SLEEP
-*/
+#define NO_AUTO_SHIFT_ALPHA
+#define NO_AUTO_SHIFT_SPECIALS
+#define AUTO_SHIFT_TIMEOUT 350
