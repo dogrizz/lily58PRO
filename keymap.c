@@ -29,6 +29,20 @@ enum layer_number {
 #define RAISE MO(_RAISE)
 #define LOWER MO(_LOWER)
 
+enum {
+    TD_LEFT_HOME,
+    TD_RIGHT_END,
+    TD_UP_PGUP,
+    TD_DWN_PGDN,
+};
+
+tap_dance_action_t tap_dance_actions[] = {
+    [TD_LEFT_HOME] = ACTION_TAP_DANCE_DOUBLE(KC_LEFT, KC_HOME),
+    [TD_RIGHT_END] = ACTION_TAP_DANCE_DOUBLE(KC_RIGHT, KC_HOME),
+    [TD_UP_PGUP] = ACTION_TAP_DANCE_DOUBLE(KC_UP, KC_PGUP),
+    [TD_DWN_PGDN] = ACTION_TAP_DANCE_DOUBLE(KC_DOWN, KC_PGDN),
+};
+
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* QWERTY
@@ -92,7 +106,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_RAISE] = LAYOUT(
   _______, _______, _______, _______, _______, _______,                     _______, _______, _______, _______, _______, _______,
   _______, KC_EXLM, KC_AT  , KC_HASH, KC_DLR,  KC_PERC,                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______,
-  _______, KC_F1  , KC_F2  , KC_F3  , KC_F4 ,  KC_F5,                       LT(0,KC_LEFT), LT(0,KC_DOWN), LT(0,KC_UP), LT(0,KC_RGHT), KC_DELETE, _______,
+  _______, KC_F1  , KC_F2  , KC_F3  , KC_F4 ,  KC_F5,                       TD(TD_LEFT_HOME), TD(TD_DWN_PGDN), TD(TD_UP_PGUP), TD(TD_RIGHT_END), KC_DELETE, _______,
   _______, KC_F6  , KC_F7  , KC_F8  , KC_F9 ,  KC_F10,  _______, _______, KC_F11 , KC_F12,  _______, _______, _______, _______,
                              _______, _______, _______,  _______, _______,  _______, _______, _______
 ),
@@ -218,38 +232,11 @@ bool oled_task_user(void) {
 }
 #endif // OLED_ENABLE
 
-
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   if (record->event.pressed) {
 #ifdef OLED_ENABLE
     set_keylog(keycode, record);
 #endif
-  }
-  switch (keycode) {
-    case LT(0,KC_UP):
-        if (!record->tap.count && record->event.pressed) {
-            tap_code16(KC_PGUP);
-            return false;
-        }
-        return true;            
-    case LT(0,KC_DOWN):
-        if (!record->tap.count && record->event.pressed) {
-            tap_code16(KC_PGDN);
-            return false;
-        }
-        return true;            
-    case LT(0,KC_LEFT):
-        if (!record->tap.count && record->event.pressed) {
-            tap_code16(KC_HOME);
-            return false;
-        }
-        return true;
-    case LT(0,KC_RIGHT):
-        if (!record->tap.count && record->event.pressed) {
-            tap_code16(KC_END);
-            return false;
-        }
-          return true;
   }
   return true;
 }
