@@ -29,20 +29,6 @@ enum layer_number {
 #define RAISE MO(_RAISE)
 #define LOWER MO(_LOWER)
 
-enum {
-    TD_LEFT_HOME,
-    TD_RIGHT_END,
-    TD_UP_PGUP,
-    TD_DWN_PGDN,
-};
-
-tap_dance_action_t tap_dance_actions[] = {
-    [TD_LEFT_HOME] = ACTION_TAP_DANCE_DOUBLE(KC_LEFT, KC_HOME),
-    [TD_RIGHT_END] = ACTION_TAP_DANCE_DOUBLE(KC_RIGHT, KC_END),
-    [TD_UP_PGUP] = ACTION_TAP_DANCE_DOUBLE(KC_UP, KC_PGUP),
-    [TD_DWN_PGDN] = ACTION_TAP_DANCE_DOUBLE(KC_DOWN, KC_PGDN),
-};
-
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 /* QWERTY
@@ -61,7 +47,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  */
 
  [_QWERTY] = LAYOUT(
-  XXXXXXX,   KC_1,  KC_2,  KC_3,    KC_4,     KC_5,                      KC_6,   KC_7,     KC_8,   KC_9,     KC_0,  KC_BSPC,
+  KC_ESC,   KC_1,   KC_2,  KC_3,    KC_4,     KC_5,                      KC_6,   KC_7,     KC_8,   KC_9,     KC_0,  KC_BSPC,
   KC_ESC,   KC_Q,   KC_W,    KC_E,    KC_R,    KC_T,                     KC_Y,    KC_U,    KC_I,    KC_O,    KC_P,    KC_BSPC,
   KC_TAB,  KC_A,   KC_S,    KC_D,    KC_F,    KC_G,                     KC_H,    KC_J,    KC_K,    KC_L,    KC_SCLN, KC_QUOT,
   KC_LSFT,  KC_Z,   KC_X,    KC_C,    KC_V,    KC_B, XXXXXXX,  XXXXXXX,  KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH,  KC_GRAVE,
@@ -106,7 +92,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 [_RAISE] = LAYOUT(
   _______, _______, _______, _______, _______, _______,                     _______, _______, _______, _______, _______, _______,
   _______, KC_EXLM, KC_AT  , KC_HASH, KC_DLR,  KC_PERC,                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______,
-  _______, KC_F1  , KC_F2  , KC_F3  , KC_F4 ,  KC_F5,                       TD(TD_LEFT_HOME), TD(TD_DWN_PGDN), TD(TD_UP_PGUP), TD(TD_RIGHT_END), KC_DELETE, _______,
+  _______, KC_F1  , KC_F2  , KC_F3  , KC_F4 ,  KC_F5,                       KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT, KC_DELETE, _______,
   _______, KC_F6  , KC_F7  , KC_F8  , KC_F9 ,  KC_F10,  _______, _______, KC_F11 , KC_F12,  _______, _______, _______, _______,
                              _______, _______, _______,  _______, _______,  _______, _______, _______
 ),
@@ -239,4 +225,61 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif
   }
   return true;
+}
+
+bool get_custom_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_LEFT:
+        case KC_RIGHT:
+        case KC_UP:
+        case KC_DOWN:
+            return true;
+        default:
+            return false;
+    }
+}
+
+void autoshift_press_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_LEFT:
+            register_code16((!shifted) ? KC_LEFT : KC_HOME);
+            break;
+        case KC_RIGHT:
+            register_code16((!shifted) ? KC_RIGHT : KC_END);
+            break;
+        case KC_DOWN:
+            register_code16((!shifted) ? KC_DOWN : KC_PGDN);
+            break;
+        case KC_UP:
+            register_code16((!shifted) ? KC_UP : KC_PGUP);
+            break;
+        default:
+            if (shifted) {
+                add_weak_mods(MOD_BIT(KC_LSFT));
+            }
+            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
+            register_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
+    }
+}
+
+void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
+    switch(keycode) {
+        case KC_LEFT:
+            unregister_code16((!shifted) ? KC_LEFT : KC_HOME);
+            break;
+        case KC_RIGHT:
+            unregister_code16((!shifted) ? KC_RIGHT : KC_END);
+            break;
+        case KC_DOWN:
+            unregister_code16((!shifted) ? KC_DOWN : KC_PGDN);
+            break;
+        case KC_UP:
+            unregister_code16((!shifted) ? KC_UP : KC_PGUP);
+            break;
+        default:
+            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
+            // The IS_RETRO check isn't really necessary here, always using
+            // keycode & 0xFF would be fine.
+            unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
+    }
 }

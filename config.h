@@ -24,11 +24,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define MASTER_LEFT
 
-//#define QUICK_TAP_TERM 0
 #define TAPPING_TERM 300
 #define NO_AUTO_SHIFT_ALPHA
 #define NO_AUTO_SHIFT_SPECIALS
-#define AUTO_SHIFT_TIMEOUT 3040
+#define AUTO_SHIFT_TIMEOUT 300
 
 // Mouse key speed and acceleration.
 #undef MOUSEKEY_DELAY
