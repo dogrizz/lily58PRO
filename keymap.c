@@ -59,20 +59,20 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
  * |      |   1  |   2  |   3  |   4  |   5  |                    |   6  |   7  |   8  |   9  |   0  |      |
  * |------+------+------+------+------+------|                    |------+------+------+------+------+------|
- * |      | ms_l | ms_d | ms_u | ms_r | mw_u |-------.    ,-------|   -  |   =  |   [  |   }  |   \  |   `  |
+ * |      | home | pg_d | pg_u |  end | ins  |-------.    ,-------|   -  |   =  |   [  |   }  |   \  |   `  |
  * |------+------+------+------+------+------|       |    |       |------+------+------+------+------+------|
- * |      |      |      | mc_l | mc_r | mw_d |-------|    |-------|   _  |   +  |   {  |   }  |   |  |  ~   |
+ * |      |      |      |      |      |      |-------|    |-------|   _  |   +  |   {  |   }  |   |  |  ~   |
  * `-----------------------------------------/       /     \      \-----------------------------------------'
  *                   |      |      |      | /       /       \      \  |      |      |      |
  *                   |      |      |      |/       /         \      \ |      |      |      |
  *                   `-------------------''-------'           '------''--------------------'
  */
 [_LOWER] = LAYOUT(
-  _______, _______, _______, _______, _______, _______,                                 _______, _______, _______,_______, _______, _______,
-  _______, KC_1   , KC_2,    KC_3,    KC_4,    KC_5   ,                                 KC_6,   KC_7,     KC_8,   KC_9,     KC_0,    _______,
-  _______, KC_MS_LEFT, KC_MS_DOWN, KC_MS_UP, KC_MS_RIGHT,KC_MS_WH_UP,                   KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, KC_BSLS, KC_GRAVE,
-  _______, _______, _______, KC_MS_BTN1, KC_MS_BTN2, KC_MS_WH_DOWN, _______,_______, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, KC_TILD,
-                             _______, _______, _______, _______, _______,  _______, _______, _______
+  _______, _______, _______, _______, _______, _______,                       _______, _______, _______,_______, _______, _______,
+  _______, KC_1   , KC_2,    KC_3,    KC_4,    KC_5   ,                       KC_6,   KC_7,     KC_8,   KC_9,     KC_0,    _______,
+  _______, KC_HOME, KC_PGDN, KC_PGUP, KC_END,  KC_INS,                      KC_MINS, KC_EQL,  KC_LBRC, KC_RBRC, KC_BSLS, KC_GRAVE,
+  _______, _______, _______, _______, _______, _______, _______,     _______, KC_UNDS, KC_PLUS, KC_LCBR, KC_RCBR, KC_PIPE, KC_TILD,
+                             _______, _______, _______, _______,     _______, _______, _______, _______
 ),
 /* RAISE
  * ,-----------------------------------------.                    ,-----------------------------------------.
@@ -93,8 +93,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   _______, _______, _______, _______, _______, _______,                     _______, _______, _______, _______, _______, _______,
   _______, KC_EXLM, KC_AT  , KC_HASH, KC_DLR,  KC_PERC,                     KC_CIRC, KC_AMPR, KC_ASTR, KC_LPRN, KC_RPRN, _______,
   _______, KC_F1  , KC_F2  , KC_F3  , KC_F4 ,  KC_F5,                       KC_LEFT, KC_DOWN, KC_UP, KC_RIGHT, KC_DELETE, _______,
-  _______, KC_F6  , KC_F7  , KC_F8  , KC_F9 ,  KC_F10,  _______, _______, KC_F11 , KC_F12,  _______, _______, _______, _______,
-                             _______, _______, _______,  _______, _______,  _______, _______, _______
+  _______, KC_F6  , KC_F7  , KC_F8  , KC_F9 ,  KC_F10,  _______,   _______, KC_F11 , KC_F12,  _______, _______, _______, _______,
+                            _______, _______, _______,  _______,   _______,  _______, _______, _______
 ),
 
 /* ADJUST
@@ -225,61 +225,4 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 #endif
   }
   return true;
-}
-
-bool get_custom_auto_shifted_key(uint16_t keycode, keyrecord_t *record) {
-    switch(keycode) {
-        case KC_LEFT:
-        case KC_RIGHT:
-        case KC_UP:
-        case KC_DOWN:
-            return true;
-        default:
-            return false;
-    }
-}
-
-void autoshift_press_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
-    switch(keycode) {
-        case KC_LEFT:
-            register_code16((!shifted) ? KC_LEFT : KC_HOME);
-            break;
-        case KC_RIGHT:
-            register_code16((!shifted) ? KC_RIGHT : KC_END);
-            break;
-        case KC_DOWN:
-            register_code16((!shifted) ? KC_DOWN : KC_PGDN);
-            break;
-        case KC_UP:
-            register_code16((!shifted) ? KC_UP : KC_PGUP);
-            break;
-        default:
-            if (shifted) {
-                add_weak_mods(MOD_BIT(KC_LSFT));
-            }
-            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
-            register_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
-    }
-}
-
-void autoshift_release_user(uint16_t keycode, bool shifted, keyrecord_t *record) {
-    switch(keycode) {
-        case KC_LEFT:
-            unregister_code16((!shifted) ? KC_LEFT : KC_HOME);
-            break;
-        case KC_RIGHT:
-            unregister_code16((!shifted) ? KC_RIGHT : KC_END);
-            break;
-        case KC_DOWN:
-            unregister_code16((!shifted) ? KC_DOWN : KC_PGDN);
-            break;
-        case KC_UP:
-            unregister_code16((!shifted) ? KC_UP : KC_PGUP);
-            break;
-        default:
-            // & 0xFF gets the Tap key for Tap Holds, required when using Retro Shift
-            // The IS_RETRO check isn't really necessary here, always using
-            // keycode & 0xFF would be fine.
-            unregister_code16((IS_RETRO(keycode)) ? keycode & 0xFF : keycode);
-    }
 }
